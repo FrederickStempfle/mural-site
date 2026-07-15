@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mural — a native home for the backgrounds you actually want to live with</title>
+<meta name="description" content="Mural is a free, native macOS wallpaper app. Still art, moving scenes, a built-in studio — your Mac, made personal." />
+<link rel="icon" type="image/png" href="assets/img/LogoMark.png" />
+<style>
+  @font-face {
+    font-family: "Virgil";
+    src: url("/assets/font/Virgil.ttf") format("truetype");
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #18141a;
+    --bg-raise: #1e1a21;
+    --panel: #241f28;
+    --panel-deep: #211c25;
+    --line: #423b48;
+    --line-soft: #332d38;
+    --ink: #ede6dc;
+    --ink-strong: #f7f2ea;
+    --muted: #a79d94;
+    --faint: #7d7570;
+    --pink: #f2a4c0;
+    --pink-deep: #e07fa4;
+    --pink-ink: #2b141f;
+    --peri: #a9b6f2;
+    --peri-ink: #171a2e;
+    --khaki: #cfc08d;
+    --khaki-dim: #8d815b;
+    --r-a: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    --r-b: 15px 225px 15px 255px / 225px 15px 255px 15px;
+    --r-c: 225px 15px 255px 15px / 15px 255px 15px 225px;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "Virgil", "Segoe Print", "Comic Sans MS", cursive;
+    background-color: var(--bg);
+    background-image: radial-gradient(rgba(237, 230, 220, 0.06) 1.1px, transparent 1.4px);
+    background-size: 26px 26px;
+    color: var(--ink);
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+
+  img { max-width: 100%; display: block; }
+
+  a { color: inherit; }
+
+  ::selection { background: var(--pink); color: var(--pink-ink); }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- hand-drawn primitives ---------- */
+
+  .sketch-a { border: 2px solid var(--line); border-radius: var(--r-a); }
+  .sketch-b { border: 2px solid var(--line); border-radius: var(--r-b); }
+  .sketch-c { border: 2px solid var(--line); border-radius: var(--r-c); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: inherit;
+    font-size: 1.05rem;
+    text-decoration: none;
+    padding: 13px 26px;
+    border: 2px solid var(--line);
+    border-radius: var(--r-a);
+    cursor: pointer;
+    transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), background 0.25s var(--ease-out);
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translateY(-2px) rotate(-0.4deg); }
+  .btn:active { transform: translateY(0) scale(0.98); }
+  .btn:focus-visible { outline: 3px dashed var(--peri); outline-offset: 4px; }
+
+  .btn-pink {
+    background: var(--pink);
+    border-color: var(--pink-deep);
+    color: var(--pink-ink);
+    box-shadow: 0 4px 0 rgba(224, 127, 164, 0.28);
+  }
+  .btn-pink:hover { background: #f6b3cb; box-shadow: 0 7px 0 rgba(224, 127, 164, 0.24); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  .btn-ghost:hover { background: rgba(237, 230, 220, 0.05); }
+
+  .btn svg { width: 19px; height: 19px; flex: none; }
+
+  /* squiggle underline */
+  .squiggle { position: relative; display: inline-block; }
+  .squiggle svg {
+    position: absolute;
+    left: -2%;
+    bottom: -0.28em;
+    width: 104%;
+    height: 0.42em;
+    overflow: visible;
+  }
+  .squiggle path {
+    fill: none;
+    stroke: var(--pink);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 620;
+    stroke-dashoffset: 620;
+  }
+  .in .squiggle path, .squiggle.in path {
+    animation: draw 1s var(--ease-out) 0.35s forwards;
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  /* washi tape strips (pure CSS, like the tape in the app) */
+  .tape {
+    position: absolute;
+    width: 96px;
+    height: 26px;
+    opacity: 0.85;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .tape-blue { background: rgba(140, 155, 214, 0.6); }
+  .tape-pink { background: rgba(226, 148, 178, 0.55); }
+  .tape-sand { background: rgba(187, 168, 116, 0.6); }
+
+  /* ---------- nav ---------- */
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(24, 20, 26, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 2px solid var(--line-soft);
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .nav-brand img { height: 34px; width: auto; }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    font-size: 1.02rem;
+  }
+  .nav-links a:not(.btn) {
+    text-decoration: none;
+    color: var(--muted);
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a:not(.btn):hover { color: var(--ink-strong); }
+  .nav-links a:not(.btn)::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 100%;
+    bottom: -5px;
+    height: 2px;
+    background: var(--pink);
+    border-radius: 2px;
+    transition: right 0.3s var(--ease-out);
+  }
+  .nav-links a:not(.btn):hover::after { right: 0; }
+  .nav .btn { padding: 8px 20px; font-size: 0.98rem; }
+
+  /* ---------- hero ---------- */
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 10fr) minmax(0, 9fr);
+    gap: 56px;
+    align-items: center;
+    padding: 88px 0 110px;
+  }
+
+  .hero-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 26px;
+  }
+  .chip {
+    font-size: 0.86rem;
+    color: var(--muted);
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-b);
+    padding: 3px 14px;
+    background: rgba(36, 31, 40, 0.6);
+  }
+  .chip strong { color: var(--khaki); font-weight: normal; }
+
+  h1 {
+    font-size: clamp(2.4rem, 5vw, 3.7rem);
+    line-height: 1.14;
+    font-weight: normal;
+    color: var(--ink-strong);
+    margin-bottom: 22px;
+    letter-spacing: 0.01em;
+  }
+
+  .hero-sub {
+    font-size: 1.22rem;
+    color: var(--muted);
+    max-width: 34rem;
+    margin-bottom: 34px;
+  }
+  .hero-sub em { color: var(--peri); font-style: normal; }
+
+  .hero-ctas { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+  .hero-note {
+    margin-top: 20px;
+    font-size: 0.95rem;
+    color: var(--faint);
+  }
+
+  .hero-art { position: relative; }
+
+  .hero-shot {
+    position: relative;
+    transform: rotate(1.4deg);
+    border: 2.5px solid var(--line);
+    border-radius: var(--r-a);
+    padding: 10px;
+    background: var(--panel);
+    box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.6);
+    animation: floaty 7s ease-in-out infinite;
+  }
+  .hero-shot img { border-radius: 14px 6px 12px 6px; }
+  .hero-shot .tape { top: -13px; }
+  .hero-shot .tape:first-of-type { left: 8%; transform: rotate(-5deg); }
+  .hero-shot .tape:last-of-type { right: 10%; transform: rotate(4deg); width: 78px; }
+
+  @keyframes floaty {
+    0%, 100% { transform: rotate(1.4deg) translateY(0); }
+    50% { transform: rotate(1.1deg) translateY(-9px); }
+  }
+
+  .hero-polaroid {
+    position: absolute;
+    left: -44px;
+    bottom: -52px;
+    width: 190px;
+    padding: 9px 9px 12px;
+    background: var(--panel);
+    border: 2px solid var(--line);
+    border-radius: var(--r-b);
+    transform: rotate(-6deg);
+    box-shadow: 0 16px 34px -10px rgba(0, 0, 0, 0.55);
+    z-index: 4;
+    animation: floaty2 8s ease-in-out infinite;
+  }
+  .hero-polaroid img { border-radius: 8px 4px 10px 4px; }
+  .hero-polaroid figcaption { font-size: 0.88rem; margin-top: 8px; color: var(--ink); }
+  .hero-polaroid .tape { top: -12px; left: 32%; width: 72px; transform: rotate(2deg); }
+
+  @keyframes floaty2 {
+    0%, 100% { transform: rotate(-6deg) translateY(0); }
+    50% { transform: rotate(-5deg) translateY(-6px); }
+  }
+
+  .hero-doodle {
+    position: absolute;
+    top: -46px;
+    right: -18px;
+    width: 110px;
+    opacity: 0.9;
+    transform: rotate(8deg);
+    pointer-events: none;
+  }
+
+  /* ---------- marquee ---------- */
+
+  .marquee {
+    border-top: 2px solid var(--line-soft);
+    border-bottom: 2px solid var(--line-soft);
+    background: var(--bg-raise);
+    overflow: hidden;
+    padding: 15px 0;
+    user-select: none;
+  }
+  .marquee-track {
+    display: flex;
+    gap: 44px;
+    width: max-content;
+    animation: scroll 46s linear infinite;
+  }
+  .marquee span {
+    font-size: 1.05rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .marquee span::after {
+    content: "·";
+    color: var(--pink);
+    margin-left: 44px;
+  }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+
+  /* ---------- sections ---------- */
+
+  section { padding: 96px 0; }
+
+  .kicker {
+    font-size: 1rem;
+    color: var(--pink);
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  h2 {
+    font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+    font-weight: normal;
+    color: var(--ink-strong);
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    color: var(--muted);
+    font-size: 1.12rem;
+    max-width: 42rem;
+  }
+
+  /* ---------- gallery ---------- */
+
+  .gallery-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    margin-bottom: 54px;
+    flex-wrap: wrap;
+  }
+
+  .gallery-grid {
+    columns: 3;
+    column-gap: 26px;
+  }
+
+  .wall-card {
+    position: relative;
+    break-inside: avoid;
+    margin-bottom: 30px;
+    background: var(--panel);
+    border: 2px solid var(--line);
+    padding: 9px 9px 4px;
+    transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out), border-color 0.35s;
+  }
+  .wall-card:nth-child(3n + 1) { border-radius: var(--r-a); transform: rotate(-1.3deg); }
+  .wall-card:nth-child(3n + 2) { border-radius: var(--r-b); transform: rotate(1.1deg); }
+  .wall-card:nth-child(3n)     { border-radius: var(--r-c); transform: rotate(-0.6deg); }
+  .wall-card:hover {
+    transform: rotate(0deg) translateY(-6px);
+    border-color: var(--pink);
+    box-shadow: 0 18px 40px -14px rgba(0, 0, 0, 0.6);
+    z-index: 2;
+  }
+  .wall-card img { border-radius: 10px 4px 10px 4px; }
+  .wall-card figcaption { padding: 10px 6px 8px; }
+  .wall-card figcaption b { display: block; font-weight: normal; font-size: 1.05rem; color: var(--ink-strong); }
+  .wall-card figcaption small { color: var(--faint); font-size: 0.85rem; }
+  .wall-card .tape { top: -12px; left: 50%; margin-left: -44px; }
+  .wall-card:nth-child(odd) .tape { transform: rotate(-3deg); }
+  .wall-card:nth-child(even) .tape { transform: rotate(3.5deg); }
+
+  .gallery-footnote {
+    margin-top: 12px;
+    color: var(--faint);
+    font-size: 0.98rem;
+    text-align: right;
+  }
+
+  /* ---------- studio (zig-zag) ---------- */
+
+  .studio { background: var(--bg-raise); border-top: 2px solid var(--line-soft); border-bottom: 2px solid var(--line-soft); }
+
+  .zig {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 64px;
+    align-items: center;
+  }
+  .zig + .zig { margin-top: 96px; }
+  .zig.flip { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); }
+  .zig.flip .zig-copy { order: 2; }
+  .zig.flip .zig-art { order: 1; }
+
+  .zig-art { position: relative; }
+  .zig-frame {
+    border: 2.5px solid var(--line);
+    padding: 10px;
+    background: var(--panel);
+    box-shadow: 0 20px 48px -16px rgba(0, 0, 0, 0.55);
+  }
+  .zig-frame img { border-radius: 12px 5px 12px 5px; }
+  .zig:first-child .zig-frame { border-radius: var(--r-b); transform: rotate(1.2deg); }
+  .zig.flip .zig-frame { border-radius: var(--r-a); transform: rotate(-1.2deg); }
+  .zig-frame .tape { top: -13px; left: 40%; }
+
+  .zig-sticker {
+    position: absolute;
+    width: 120px;
+    pointer-events: none;
+    z-index: 4;
+  }
+
+  .hand-list { list-style: none; margin-top: 26px; }
+  .hand-list li {
+    position: relative;
+    padding-left: 34px;
+    margin-bottom: 14px;
+    color: var(--muted);
+    font-size: 1.08rem;
+  }
+  .hand-list li b { color: var(--ink); font-weight: normal; }
+  .hand-list li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 0.42em;
+    width: 16px;
+    height: 12px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 18'%3E%3Cpath d='M2.5 10.5c2.8 2.6 4.6 4.4 5.7 5.8C11.5 10 16 5 21.8 2.2' fill='none' stroke='%23f2a4c0' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  /* ---------- features (asymmetric bento) ---------- */
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 26px;
+    margin-top: 56px;
+  }
+
+  .feature {
+    position: relative;
+    background: var(--panel);
+    border: 2px solid var(--line);
+    padding: 30px 30px 28px;
+    transition: transform 0.35s var(--ease-out), border-color 0.35s;
+  }
+  .feature:nth-child(1) { border-radius: var(--r-a); transform: rotate(-0.5deg); }
+  .feature:nth-child(2) { border-radius: var(--r-b); transform: rotate(0.7deg); }
+  .feature:nth-child(3) { border-radius: var(--r-c); transform: rotate(0.5deg); }
+  .feature:nth-child(4) { border-radius: var(--r-a); transform: rotate(-0.7deg); }
+  .feature:hover { transform: rotate(0deg) translateY(-4px); border-color: var(--peri); }
+
+  .feature h3 {
+    font-weight: normal;
+    font-size: 1.35rem;
+    color: var(--ink-strong);
+    margin-bottom: 10px;
+  }
+  .feature p { color: var(--muted); font-size: 1.05rem; }
+  .feature p b { color: var(--khaki); font-weight: normal; }
+
+  .feature-icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 16px;
+  }
+  .feature-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: var(--pink);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+  }
+  .feature:nth-child(2) .feature-icon svg { stroke: var(--peri); }
+  .feature:nth-child(3) .feature-icon svg { stroke: var(--khaki); }
+
+  .feature-sticker {
+    position: absolute;
+    right: -20px;
+    top: -26px;
+    width: 78px;
+    transform: rotate(10deg);
+    pointer-events: none;
+  }
+
+  /* ---------- download ---------- */
+
+  .download-note {
+    position: relative;
+    max-width: 780px;
+    margin: 0 auto;
+    background: rgba(207, 192, 141, 0.09);
+    border: 2px solid var(--khaki-dim);
+    border-radius: var(--r-b);
+    padding: 56px 56px 50px;
+    text-align: center;
+    transform: rotate(-0.5deg);
+  }
+  .download-note .tape { top: -14px; }
+  .download-note .tape:first-of-type { left: 12%; transform: rotate(-4deg); }
+  .download-note .tape:last-of-type { right: 12%; transform: rotate(5deg); }
+
+  .download-note h2 { margin-bottom: 12px; }
+  .download-note > p { color: var(--muted); font-size: 1.12rem; max-width: 34rem; margin: 0 auto 32px; }
+
+  .code-block {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.92rem;
+    text-align: left;
+    background: var(--panel-deep);
+    border: 2px solid var(--line);
+    border-radius: var(--r-c);
+    padding: 20px 26px;
+    margin: 34px auto 0;
+    max-width: 640px;
+    color: var(--ink);
+    line-height: 1.9;
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+  .code-block .prompt { color: var(--pink); user-select: none; }
+  .code-block .comment { color: var(--faint); }
+
+  .download-small {
+    margin-top: 22px;
+    font-size: 0.92rem;
+    color: var(--faint);
+  }
+
+  /* ---------- footer ---------- */
+
+  footer {
+    border-top: 2px solid var(--line-soft);
+    padding: 64px 0 0;
+    overflow: hidden;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 48px;
+    align-items: start;
+    padding-bottom: 64px;
+  }
+  .footer-brand img.mark { width: 54px; margin-bottom: 16px; }
+  .footer-brand .tagline { color: var(--ink); font-size: 1.15rem; margin-bottom: 12px; }
+  .footer-brand .fine {
+    font-size: 0.88rem;
+    color: var(--faint);
+    max-width: 34rem;
+  }
+
+  .foot-cols {
+    display: flex;
+    gap: 64px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+  .foot-col h4 {
+    font-weight: normal;
+    font-size: 0.92rem;
+    color: var(--faint);
+    margin-bottom: 14px;
+    letter-spacing: 0.06em;
+  }
+  .foot-col a {
+    display: block;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 1.02rem;
+    margin-bottom: 10px;
+    transition: color 0.2s, transform 0.2s var(--ease-out);
+  }
+  .foot-col a:hover { color: var(--pink); transform: translateX(3px); }
+
+  .footer-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    border-top: 2px solid var(--line-soft);
+    padding: 18px 0 8px;
+    font-size: 0.88rem;
+    color: var(--faint);
+  }
+
+  .footer-giant {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 24px;
+    max-width: 1180px;
+    margin: 8px auto -0.16em;
+    font-size: clamp(4.6rem, 17.5vw, 15.5rem);
+    line-height: 0.82;
+    user-select: none;
+    pointer-events: auto;
+  }
+  .footer-giant span {
+    display: inline-block;
+    background: linear-gradient(to bottom, rgba(237, 230, 220, 0.34), rgba(237, 230, 220, 0.04));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: transform 0.35s var(--ease-out), background 0.35s;
+  }
+  .footer-giant span:nth-child(odd) { transform: rotate(-1.2deg); }
+  .footer-giant span:nth-child(even) { transform: rotate(1deg) translateY(-0.02em); }
+  .footer-giant span:hover {
+    background: var(--pink);
+    -webkit-background-clip: text;
+    background-clip: text;
+    transform: translateY(-0.06em) rotate(-2deg);
+  }
+
+  .footer-giant.reveal span {
+    opacity: 0;
+    transform: translateY(0.35em);
+    transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+    transition-delay: var(--d, 0s);
+  }
+  .footer-giant.reveal.in span { opacity: 1; transform: none; }
+  .footer-giant.reveal.in span:nth-child(odd) { transform: rotate(-1.2deg); }
+  .footer-giant.reveal.in span:nth-child(even) { transform: rotate(1deg) translateY(-0.02em); }
+  .footer-giant.reveal.in span:hover { transform: translateY(-0.06em) rotate(-2deg); }
+
+  /* ---------- reveal on scroll ---------- */
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px) rotate(0.001deg);
+    transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+    transition-delay: var(--d, 0s);
+  }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .hero-shot, .hero-polaroid, .marquee-track { animation: none; }
+    .squiggle path { stroke-dashoffset: 0; animation: none; }
+  }
+
+  /* ---------- responsive ---------- */
+
+  @media (max-width: 980px) {
+    .hero { grid-template-columns: 1fr; gap: 72px; padding: 56px 0 90px; }
+    .hero-art { max-width: 620px; }
+    .gallery-grid { columns: 2; }
+    .zig, .zig.flip { grid-template-columns: 1fr; gap: 40px; }
+    .zig.flip .zig-copy { order: 1; }
+    .zig.flip .zig-art { order: 2; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .download-note { padding: 48px 28px 42px; }
+    .footer-top { grid-template-columns: 1fr; gap: 40px; }
+    .foot-cols { justify-content: flex-start; gap: 48px; }
+  }
+
+  @media (max-width: 640px) {
+    .nav-links a:not(.btn) { display: none; }
+    .gallery-grid { columns: 1; }
+    .hero-polaroid { left: -8px; width: 150px; }
+    .hero-doodle { width: 80px; top: -34px; right: -4px; }
+    .zig-sticker { width: 76px !important; right: -4px !important; left: auto !important; }
+    section { padding: 72px 0; }
+  }
+</style>
+<noscript>
+  <style>
+    .reveal, .footer-giant.reveal span { opacity: 1 !important; transform: none !important; }
+    .squiggle path { stroke-dashoffset: 0; animation: none; }
+  </style>
+</noscript>
+</head>
+<body>
+
+<header>
+  <nav class="nav" aria-label="Main">
+    <a class="nav-brand" href="#top" aria-label="Mural home">
+      <img src="assets/img/WordmarkDark.png" alt="Mural" />
+    </a>
+    <div class="nav-links">
+      <a href="#gallery">Gallery</a>
+      <a href="#studio">Studio</a>
+      <a href="#features">Features</a>
+      <a class="btn btn-pink" href="#download">Get Mural</a>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <div class="wrap">
+    <section class="hero" style="padding-top: 72px;">
+      <div class="reveal in">
+        <div class="hero-badges">
+          <span class="chip"><strong>Free</strong> &amp; open source</span>
+          <span class="chip">Native <strong>SwiftUI</strong></span>
+          <span class="chip">macOS <strong>14+</strong></span>
+        </div>
+        <h1>
+          The backgrounds you actually want to
+          <span class="squiggle in">live with.
+            <svg viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M4 14 C 40 6, 70 20, 105 12 S 175 5, 210 13 S 270 18, 296 9" />
+            </svg>
+          </span>
+        </h1>
+        <p class="hero-sub">
+          Mural is a small, native home for your wallpapers on the Mac.
+          <em>Still art. Moving scenes.</em> A little studio to sketch your own.
+          No accounts, no storefront, no web wrapper.
+        </p>
+        <div class="hero-ctas">
+          <a class="btn btn-pink" href="#download">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 20h16" />
+            </svg>
+            Download for macOS
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/FrederickStempfle/Mural" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.49 0-.24-.01-.88-.01-1.73-2.78.62-3.37-1.37-3.37-1.37-.46-1.18-1.11-1.5-1.11-1.5-.91-.63.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.36 9.36 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.25 10.25 0 0 0 22 12.25C22 6.58 17.52 2 12 2z" />
+            </svg>
+            View on GitHub
+          </a>
+        </div>
+        <p class="hero-note">One job: keep the wallpapers you love and put them on your screen.</p>
+      </div>
+
+      <div class="hero-art reveal in" style="--d: 0.15s;">
+        <img class="hero-doodle" src="assets/stickers/Sticker-Star-Doodles.png" alt="" aria-hidden="true" />
+        <div class="hero-shot">
+          <span class="tape tape-blue"></span>
+          <span class="tape tape-sand"></span>
+          <img src="assets/img/app-screenshot.jpg" alt="The Mural app showing a dark gallery of wallpapers with hand-drawn frames, washi tape, and a pink Set Desktop button" />
+        </div>
+        <figure class="hero-polaroid">
+          <span class="tape tape-pink"></span>
+          <img src="assets/img/chureito-bloom.jpg" alt="Chureito Bloom wallpaper — a pagoda among cherry blossoms at sunset" />
+          <figcaption>Chureito Bloom</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ MARQUEE ============ -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Amalfi Reverie</span><span>Shinjuku Rain</span><span>Bled Morning</span><span>Northern Lights Observatory</span><span>Zen Garden Dawn</span><span>Pacific Coast Highway</span><span>Chureito Bloom</span><span>Lake Ashi Woodblock</span><span>Highland Fog</span><span>Ginza Crossing</span><span>Yasaka Pagoda Path</span><span>Platform Sunset</span>
+      <span>Amalfi Reverie</span><span>Shinjuku Rain</span><span>Bled Morning</span><span>Northern Lights Observatory</span><span>Zen Garden Dawn</span><span>Pacific Coast Highway</span><span>Chureito Bloom</span><span>Lake Ashi Woodblock</span><span>Highland Fog</span><span>Ginza Crossing</span><span>Yasaka Pagoda Path</span><span>Platform Sunset</span>
+    </div>
+  </div>
+
+  <!-- ============ GALLERY ============ -->
+  <section id="gallery">
+    <div class="wrap">
+      <div class="gallery-head reveal">
+        <div>
+          <p class="kicker">The gallery</p>
+          <h2>
+            A <span class="squiggle">hand-picked<svg viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12 C 50 18, 90 6, 140 13 S 240 8, 296 14" /></svg></span> starter collection
+          </h2>
+          <p class="section-sub">
+            Eighteen stills spanning woodblock prints, anime skylines, neon nights, and quiet
+            mornings — plus five procedural wallpapers rendered locally the moment you choose them.
+          </p>
+        </div>
+      </div>
+
+      <div class="gallery-grid">
+        <figure class="wall-card reveal"><span class="tape tape-blue"></span><img src="assets/img/amalfi-reverie.jpg" alt="Amalfi Reverie — a sepia coastal terrace overlooking the sea" loading="lazy" /><figcaption><b>Amalfi Reverie</b><small>Mural Studio</small></figcaption></figure>
+        <figure class="wall-card reveal" style="--d: 0.06s;"><span class="tape tape-pink"></span><img src="assets/img/shinjuku-rain.jpg" alt="Shinjuku Rain — neon signs reflecting on a wet Tokyo street" loading="lazy" /><figcaption><b>Shinjuku Rain</b><small>Neon nights</small></figcaption></figure>
+        <figure class="wall-card reveal" style="--d: 0.12s;"><span class="tape tape-sand"></span><img src="assets/img/northern-lights-observatory.jpg" alt="Northern Lights Observatory — aurora over a snowy observatory" loading="lazy" /><figcaption><b>Northern Lights Observatory</b><small>Quiet skies</small></figcaption></figure>
+        <figure class="wall-card reveal"><span class="tape tape-pink"></span><img src="assets/img/lake-ashi-woodblock.jpg" alt="Lake Ashi Woodblock — a woodblock-print style lake and torii gate" loading="lazy" /><figcaption><b>Lake Ashi Woodblock</b><small>Woodblock prints</small></figcaption></figure>
+        <figure class="wall-card reveal" style="--d: 0.06s;"><span class="tape tape-blue"></span><img src="assets/img/zen-garden-dawn.jpg" alt="Zen Garden Dawn — raked sand and stones at first light" loading="lazy" /><figcaption><b>Zen Garden Dawn</b><small>Quiet mornings</small></figcaption></figure>
+        <figure class="wall-card reveal" style="--d: 0.12s;"><span class="tape tape-sand"></span><img src="assets/img/pacific-coast-highway.jpg" alt="Pacific Coast Highway — cliffs and ocean along a winding road" loading="lazy" /><figcaption><b>Pacific Coast Highway</b><small>Open roads</small></figcaption></figure>
+        <figure class="wall-card reveal"><span class="tape tape-blue"></span><img src="assets/img/ginza-crossing.jpg" alt="Ginza Crossing — a busy Tokyo intersection in stylised colour" loading="lazy" /><figcaption><b>Ginza Crossing</b><small>Anime skylines</small></figcaption></figure>
+        <figure class="wall-card reveal" style="--d: 0.06s;"><span class="tape tape-pink"></span><img src="assets/img/highland-fog.jpg" alt="Highland Fog — misty layered hills in muted blues" loading="lazy" /><figcaption><b>Highland Fog</b><small>Quiet skies</small></figcaption></figure>
+        <figure class="wall-card reveal" style="--d: 0.12s;"><span class="tape tape-sand"></span><img src="assets/img/yasaka-pagoda-path.jpg" alt="Yasaka Pagoda Path — a lantern-lit street leading to a pagoda" loading="lazy" /><figcaption><b>Yasaka Pagoda Path</b><small>Evening walks</small></figcaption></figure>
+      </div>
+      <p class="gallery-footnote reveal">…and nine more waiting in the box.</p>
+    </div>
+  </section>
+
+  <!-- ============ STUDIO ============ -->
+  <section id="studio" class="studio">
+    <div class="wrap">
+      <div class="zig">
+        <div class="zig-copy reveal">
+          <p class="kicker">Mural Studio</p>
+          <h2>When nothing in the box fits, <span class="squiggle">sketch your own.<svg viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true"><path d="M4 13 C 45 7, 85 19, 130 11 S 220 6, 296 13" /></svg></span></h2>
+          <p class="section-sub">
+            A small wallpaper workshop built into the sidebar. Start from a drawn backdrop
+            or a photo of your own, then tune it until it feels right.
+          </p>
+          <ul class="hand-list">
+            <li><b>Twelve drawn backdrop styles</b> — dunes, aurora, plaid, moonrise, and friends.</li>
+            <li><b>Seventeen curated palettes</b>, free-form colours, and a variation dice.</li>
+            <li>Everything renders locally at <b>2880×1800</b> — one click from your desktop.</li>
+          </ul>
+        </div>
+        <div class="zig-art reveal" style="--d: 0.12s;">
+          <img class="zig-sticker" src="assets/stickers/Sticker-Sun-Doodle.png" alt="" aria-hidden="true" style="top: -54px; right: -26px; transform: rotate(12deg);" />
+          <div class="zig-frame">
+            <span class="tape tape-pink"></span>
+            <img src="assets/img/studio-styles.jpg" alt="The twelve Mural Studio backdrop styles, each rendered in a different palette" loading="lazy" />
+          </div>
+        </div>
+      </div>
+
+      <div class="zig flip">
+        <div class="zig-copy reveal">
+          <p class="kicker">Scrapbook stickers</p>
+          <h2>Then comes the fun part.</h2>
+          <p class="section-sub">
+            Taped paper notes, washi tape, a polaroid frame, a vintage postage stamp,
+            and hand-drawn doodles. Drag them anywhere — resize, rotate, layer —
+            until your desktop looks like a page from your favourite notebook.
+          </p>
+          <ul class="hand-list">
+            <li>Drag, resize, rotate, and layer <b>any sticker, anywhere</b>.</li>
+            <li>Finished pieces land in <b>My Wallpapers</b>, ready to apply.</li>
+          </ul>
+        </div>
+        <div class="zig-art reveal" style="--d: 0.12s;">
+          <img class="zig-sticker" src="assets/stickers/Sticker-Heart-Doodle.png" alt="" aria-hidden="true" style="bottom: -44px; left: -30px; width: 96px; transform: rotate(-10deg);" />
+          <div class="zig-frame">
+            <span class="tape tape-blue"></span>
+            <img src="assets/img/studio-collage.jpg" alt="A Mural Studio collage with a photo backdrop, washi tape, paper notes, and doodle stickers" loading="lazy" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section id="features">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="kicker">Made to feel like a little gallery</p>
+        <h2>No web wrapper. No account.<br />No wallpaper storefront.</h2>
+        <p class="section-sub">
+          Just a small library that gives your desktop the attention it deserves.
+        </p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature reveal">
+          <img class="feature-sticker" src="assets/stickers/Sticker-Arrow-Doodle.png" alt="" aria-hidden="true" />
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2" /><path d="M8 21h8M12 17v4M7 12l3-3.5L13 12l4-5" /></svg>
+          </div>
+          <h3>Still &amp; moving</h3>
+          <p>
+            Bring your own images and videos. Mural's <b>WallpaperAgent</b> keeps video
+            playback running on the Desktop and Lock Screen after the app closes —
+            across displays and Spaces.
+          </p>
+        </article>
+
+        <article class="feature reveal" style="--d: 0.08s;">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-8-4.7-8-10A4.6 4.6 0 0 1 12 7.2 4.6 4.6 0 0 1 20 10.5c0 5.3-8 10-8 10z" /></svg>
+          </div>
+          <h3>Favourites &amp; recents</h3>
+          <p>
+            Keep favourites close and revisit recently used wallpapers,
+            so the good ones never get lost in a folder somewhere.
+          </p>
+        </article>
+
+        <article class="feature reveal" style="--d: 0.08s;">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="12" height="9" rx="1.5" /><rect x="16.5" y="8" width="5" height="9" rx="1.2" /><path d="M6 17h5" /></svg>
+          </div>
+          <h3>Every display, or just one</h3>
+          <p>
+            Apply a wallpaper to <b>all displays</b> or only your main one —
+            the same choice the app gives you in a single click.
+          </p>
+        </article>
+
+        <article class="feature reveal" style="--d: 0.16s;">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.2 5.4L20 9l-4.4 3.8L17 19l-5-3.2L7 19l1.4-6.2L4 9l5.8-.6z" /></svg>
+          </div>
+          <h3>Native, free, yours</h3>
+          <p>
+            Built with <b>SwiftUI</b> for macOS 14 and later. Open source,
+            free forever, and everything renders on your machine.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DOWNLOAD ============ -->
+  <section id="download">
+    <div class="wrap">
+      <div class="download-note reveal">
+        <span class="tape tape-blue"></span>
+        <span class="tape tape-pink"></span>
+        <p class="kicker">Get Mural</p>
+        <h2>Make it yours.</h2>
+        <p>
+          Grab the app, or build it from source in a couple of minutes.
+          Either way — free, native, and no strings attached.
+        </p>
+        <a class="btn btn-pink" href="https://github.com/FrederickStempfle/Mural/releases" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 20h16" />
+          </svg>
+          Download for macOS
+        </a>
+        <div class="code-block" role="figure" aria-label="Build from source commands">
+          <span class="comment"># or build it yourself</span><br />
+          <span class="prompt">$</span> git clone https://github.com/FrederickStempfle/Mural.git<br />
+          <span class="prompt">$</span> cd Mural &amp;&amp; ./scripts/build-app.sh<br />
+          <span class="prompt">$</span> open dist/Mural.app
+        </div>
+        <p class="download-small">
+          Requires macOS 14 or later. Animated video wallpapers need macOS 26.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img class="mark" src="assets/img/LogoMark.png" alt="Mural logo mark" />
+        <p class="tagline">Made for Macs that deserve better backgrounds.</p>
+        <p class="fine">
+          The video-wallpaper integration depends on private Apple frameworks; it may break
+          after a macOS update and isn't suitable for Mac App Store distribution.
+        </p>
+      </div>
+      <nav class="foot-cols" aria-label="Footer">
+        <div class="foot-col">
+          <h4>Explore</h4>
+          <a href="#gallery">Gallery</a>
+          <a href="#studio">Studio</a>
+          <a href="#features">Features</a>
+          <a href="#download">Download</a>
+        </div>
+        <div class="foot-col">
+          <h4>Elsewhere</h4>
+          <a href="https://github.com/FrederickStempfle/Mural" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/FrederickStempfle/Mural/releases" target="_blank" rel="noopener">Releases</a>
+          <a href="https://github.com/FrederickStempfle/Mural/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener">Third-party notices</a>
+        </div>
+      </nav>
+    </div>
+
+    <div class="footer-meta">
+      <span>Free &amp; open source, forever.</span>
+      <a href="#top" style="color: inherit;">Back to top</a>
+    </div>
+  </div>
+
+  <div class="footer-giant reveal" aria-hidden="true">
+    <span style="--d: 0s;">M</span><span style="--d: 0.07s;">U</span><span style="--d: 0.14s;">R</span><span style="--d: 0.21s;">A</span><span style="--d: 0.28s;">L</span>
+  </div>
+</footer>
+
+<script type="module" src="/src/main.js"></script>
+
+</body>
+</html>
