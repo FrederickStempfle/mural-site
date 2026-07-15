@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Roadmap — Mural</title>
+<meta name="description" content="Where Mural is headed: from a native wallpaper gallery to a community-driven home where anyone can publish their walls." />
+<meta name="theme-color" content="#18141a" />
+<link rel="canonical" href="https://mural-site-cy1.pages.dev/roadmap" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Mural" />
+<meta property="og:title" content="Roadmap — Mural" />
+<meta property="og:description" content="Where Mural is headed: from a native wallpaper gallery to a community-driven home where anyone can publish their walls." />
+<meta property="og:url" content="https://mural-site-cy1.pages.dev/roadmap" />
+<meta property="og:image" content="https://mural-site-cy1.pages.dev/assets/img/app-screenshot.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" type="image/png" href="assets/img/favicon.png" />
+<link rel="preload" href="/assets/font/Virgil.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+  @font-face {
+    font-family: "Virgil";
+    src: url("/assets/font/Virgil.woff2") format("woff2"),
+         url("/assets/font/Virgil.ttf") format("truetype");
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #18141a;
+    --panel: #241f28;
+    --line: #423b48;
+    --line-soft: #332d38;
+    --ink: #ede6dc;
+    --ink-strong: #f7f2ea;
+    --muted: #a79d94;
+    --faint: #7d7570;
+    --pink: #f2a4c0;
+    --pink-deep: #e07fa4;
+    --pink-ink: #2b141f;
+    --peri: #a9b6f2;
+    --khaki: #cfc08d;
+    --khaki-dim: #8d815b;
+    --r-a: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    --r-b: 15px 225px 15px 255px / 225px 15px 255px 15px;
+    --r-c: 225px 15px 255px 15px / 15px 255px 15px 225px;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "Virgil", "Segoe Print", "Comic Sans MS", cursive;
+    background-color: var(--bg);
+    background-image: radial-gradient(rgba(237, 230, 220, 0.06) 1.1px, transparent 1.4px);
+    background-size: 26px 26px;
+    color: var(--ink);
+    line-height: 1.55;
+    overflow-x: hidden;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  img { max-width: 100%; height: auto; display: block; }
+
+  a { color: inherit; }
+
+  ::selection { background: var(--pink); color: var(--pink-ink); }
+
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px;
+    width: 100%;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: inherit;
+    font-size: 1.02rem;
+    text-decoration: none;
+    padding: 12px 24px;
+    border: 2px solid var(--line);
+    border-radius: var(--r-a);
+    cursor: pointer;
+    transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), background 0.25s var(--ease-out);
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translateY(-2px) rotate(-0.4deg); }
+  .btn:active { transform: translateY(0) scale(0.98); }
+  .btn:focus-visible { outline: 3px dashed var(--peri); outline-offset: 4px; }
+  .btn-pink {
+    background: var(--pink);
+    border-color: var(--pink-deep);
+    color: var(--pink-ink);
+    box-shadow: 0 4px 0 rgba(224, 127, 164, 0.28);
+  }
+  .btn-pink:hover { background: #f6b3cb; }
+  .btn-ghost { background: transparent; color: var(--ink); }
+  .btn-ghost:hover { background: rgba(237, 230, 220, 0.05); }
+  .btn svg { width: 19px; height: 19px; flex: none; }
+
+  .nav-btn { padding: 8px 20px; font-size: 0.98rem; }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(24, 20, 26, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 2px solid var(--line-soft);
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .nav-brand img { height: 34px; width: auto; }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    font-size: 1.02rem;
+  }
+  .nav-links a:not(.btn) {
+    text-decoration: none;
+    color: var(--muted);
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a:not(.btn):hover { color: var(--ink-strong); }
+  .nav-links a:not(.btn)::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 100%;
+    bottom: -5px;
+    height: 2px;
+    background: var(--pink);
+    border-radius: 2px;
+    transition: right 0.3s var(--ease-out);
+  }
+  .nav-links a:not(.btn):hover::after { right: 0; }
+
+  main { flex: 1; }
+
+  /* ---------- page head ---------- */
+
+  .page-head {
+    position: relative;
+    padding: 76px 0 40px;
+  }
+  .kicker {
+    font-size: 1rem;
+    color: var(--pink);
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: clamp(2.1rem, 4.6vw, 3.1rem);
+    line-height: 1.14;
+    font-weight: normal;
+    color: var(--ink-strong);
+    margin-bottom: 16px;
+  }
+  .squiggle { position: relative; display: inline-block; }
+  .squiggle svg {
+    position: absolute;
+    left: -2%;
+    bottom: -0.28em;
+    width: 104%;
+    height: 0.42em;
+    overflow: visible;
+  }
+  .squiggle path {
+    fill: none;
+    stroke: var(--pink);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 620;
+    stroke-dashoffset: 620;
+  }
+  .in .squiggle path { animation: draw 1s var(--ease-out) 0.35s forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  .page-sub { color: var(--muted); font-size: 1.14rem; max-width: 36rem; }
+  .page-sub em { color: var(--peri); font-style: normal; }
+
+  .head-sticker {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    width: 130px;
+    transform: rotate(9deg);
+    pointer-events: none;
+    opacity: 0.95;
+  }
+
+  /* ---------- timeline ---------- */
+
+  .road {
+    position: relative;
+    margin: 24px 0 40px;
+    padding: 12px 0 12px 46px;
+    border-left: 3px dashed var(--line);
+  }
+
+  .stop {
+    position: relative;
+    background: var(--panel);
+    border: 2px solid var(--line);
+    padding: 26px 30px 24px;
+    margin-bottom: 40px;
+  }
+  .stop:nth-child(3n + 1) { border-radius: var(--r-a); transform: rotate(-0.5deg); }
+  .stop:nth-child(3n + 2) { border-radius: var(--r-b); transform: rotate(0.5deg); }
+  .stop:nth-child(3n)     { border-radius: var(--r-c); transform: rotate(-0.3deg); }
+  .stop:last-child { margin-bottom: 0; }
+
+  /* node on the dashed line */
+  .stop::before {
+    content: "";
+    position: absolute;
+    left: -59px;
+    top: 30px;
+    width: 18px;
+    height: 18px;
+    border-radius: 55% 45% 50% 50% / 50% 55% 45% 50%;
+    border: 3px solid var(--dot, var(--line));
+    background: var(--bg);
+  }
+  .stop.done::before { background: var(--dot); }
+
+  .stop .tape {
+    position: absolute;
+    top: -13px;
+    width: 96px;
+    height: 26px;
+    opacity: 0.85;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+  }
+  .stop:nth-child(odd) .tape { left: 7%; transform: rotate(-4deg); }
+  .stop:nth-child(even) .tape { right: 7%; transform: rotate(4deg); }
+  .tape-blue { background: rgba(140, 155, 214, 0.6); }
+  .tape-pink { background: rgba(226, 148, 178, 0.55); }
+  .tape-sand { background: rgba(187, 168, 116, 0.6); }
+
+  .stop-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .stop h2 {
+    font-weight: normal;
+    font-size: 1.45rem;
+    color: var(--ink-strong);
+  }
+  .chip {
+    font-size: 0.85rem;
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-b);
+    padding: 3px 14px;
+    background: rgba(36, 31, 40, 0.6);
+    white-space: nowrap;
+  }
+  .chip-done { color: var(--khaki); border-color: var(--khaki-dim); }
+  .chip-doing { color: var(--peri); }
+  .chip-goal { color: var(--pink); border-color: var(--pink-deep); }
+  .chip-someday { color: var(--faint); }
+
+  .stop p { color: var(--muted); font-size: 1.05rem; margin-bottom: 8px; }
+  .stop p:last-child { margin-bottom: 0; }
+  .stop b { color: var(--ink); font-weight: normal; }
+
+  .stop ul { list-style: none; margin-top: 12px; }
+  .stop li {
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 9px;
+    color: var(--muted);
+    font-size: 1.02rem;
+  }
+  .stop li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.42em;
+    width: 15px;
+    height: 11px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 18'%3E%3Cpath d='M2.5 10.5c2.8 2.6 4.6 4.4 5.7 5.8C11.5 10 16 5 21.8 2.2' fill='none' stroke='%23f2a4c0' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  /* ---------- CTA ---------- */
+
+  .road-cta {
+    text-align: center;
+    padding: 16px 0 96px;
+  }
+  .road-cta p {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 32rem;
+    margin: 0 auto 22px;
+  }
+
+  /* ---------- footer ---------- */
+
+  footer {
+    border-top: 2px solid var(--line-soft);
+    padding: 28px 0;
+  }
+  .footer-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 0.92rem;
+    color: var(--faint);
+  }
+  .footer-meta a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  .footer-meta a:hover { color: var(--pink); }
+
+  /* ---------- reveal ---------- */
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px) rotate(0.001deg);
+    transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+    transition-delay: var(--d, 0s);
+  }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .squiggle path { stroke-dashoffset: 0; animation: none; }
+  }
+
+  @media (max-width: 640px) {
+    .nav-links a:not(.btn) { display: none; }
+    .page-head { padding: 56px 0 28px; }
+    .head-sticker { width: 92px; top: 36px; }
+    .road { padding-left: 30px; }
+    .stop { padding: 22px 20px 20px; }
+    .stop::before { left: -43px; width: 14px; height: 14px; }
+  }
+</style>
+<noscript>
+  <style>
+    .reveal { opacity: 1 !important; transform: none !important; }
+    .squiggle path { stroke-dashoffset: 0; animation: none; }
+  </style>
+</noscript>
+</head>
+<body>
+
+<header>
+  <nav class="nav" aria-label="Main">
+    <a class="nav-brand" href="/" aria-label="Mural home">
+      <img src="assets/img/WordmarkDark.webp" alt="Mural" width="268" height="102" />
+    </a>
+    <div class="nav-links">
+      <a href="/#gallery">Gallery</a>
+      <a href="/#studio">Studio</a>
+      <a href="/#features">Features</a>
+      <a class="btn btn-pink nav-btn" href="https://github.com/FrederickStempfle/Mural/releases/download/v1.0.0/Mural.dmg" download="Mural.dmg">Get Mural</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="page-head reveal in">
+      <img class="head-sticker" src="assets/stickers/Sticker-Where-Next.webp" alt="" aria-hidden="true" width="300" height="300" />
+      <p class="kicker">The roadmap</p>
+      <h1>
+        Where
+        <span class="squiggle">next?
+          <svg viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M4 14 C 40 6, 70 20, 105 12 S 175 5, 210 13 S 270 18, 296 9" />
+          </svg>
+        </span>
+      </h1>
+      <p class="page-sub">
+        Mural today is a little gallery that lives on your Mac.
+        The plan: turn it into a wall <em>we all paint together</em> —
+        a community place where anyone can publish their wallpapers.
+      </p>
+    </div>
+
+    <div class="road">
+      <article class="stop done reveal in" style="--dot: var(--khaki);">
+        <span class="tape tape-sand"></span>
+        <div class="stop-top">
+          <h2>A native home</h2>
+          <span class="chip chip-done">Shipped · v1.0</span>
+        </div>
+        <p>
+          The app as it is today — and the foundation everything else builds on.
+        </p>
+        <ul>
+          <li>A hand-picked gallery of stills, plus procedural wallpapers.</li>
+          <li><b>Mural Studio</b> — drawn backdrops, palettes, scrapbook stickers.</li>
+          <li>Video wallpapers on the Desktop &amp; Lock Screen (macOS 26).</li>
+        </ul>
+      </article>
+
+      <article class="stop reveal in" style="--dot: var(--peri); --d: 0.08s;">
+        <span class="tape tape-blue"></span>
+        <div class="stop-top">
+          <h2>The Mural server</h2>
+          <span class="chip chip-doing">In the works</span>
+        </div>
+        <p>
+          A small, quiet home on the internet for wallpapers. The app checks in,
+          and fresh walls simply appear in the box — <b>no account needed to browse</b>.
+        </p>
+        <ul>
+          <li>A public wallpaper feed the app can pull from.</li>
+          <li>New curated drops without waiting for an app update.</li>
+        </ul>
+      </article>
+
+      <article class="stop reveal in" style="--dot: var(--pink); --d: 0.16s;">
+        <span class="tape tape-pink"></span>
+        <div class="stop-top">
+          <h2>Community wallpapers</h2>
+          <span class="chip chip-goal">The goal</span>
+        </div>
+        <p>
+          The whole point of the journey: <b>anyone can publish</b>. Sketch something
+          lovely in Mural Studio, hit share, and it hangs on the community wall for
+          everyone to take home.
+        </p>
+        <ul>
+          <li>Upload straight from Mural Studio or your own files.</li>
+          <li>Human-reviewed submissions, so the gallery stays hand-picked — never a dumping ground.</li>
+          <li>Credit where it's due: every wall carries its maker's name.</li>
+        </ul>
+      </article>
+
+      <article class="stop reveal in" style="--dot: var(--faint); --d: 0.24s;">
+        <span class="tape tape-sand"></span>
+        <div class="stop-top">
+          <h2>Wherever you take it</h2>
+          <span class="chip chip-someday">Someday</span>
+        </div>
+        <p>
+          Themed packs, seasonal drops, collab collections — once the community wall
+          exists, the community decides what hangs on it.
+        </p>
+      </article>
+    </div>
+
+    <div class="road-cta reveal in">
+      <p>
+        Have an opinion about where Mural should go? The roadmap is a sketch,
+        not a contract — come argue about it.
+      </p>
+      <a class="btn btn-ghost" href="https://github.com/FrederickStempfle/Mural/issues" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.49 0-.24-.01-.88-.01-1.73-2.78.62-3.37-1.37-3.37-1.37-.46-1.18-1.11-1.5-1.11-1.5-.91-.63.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.36 9.36 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.25 10.25 0 0 0 22 12.25C22 6.58 17.52 2 12 2z" />
+        </svg>
+        Share your ideas on GitHub
+      </a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-meta">
+      <span>Free &amp; open source, forever.</span>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/">← Back to the mural</a>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="/src/main.js"></script>
+
+</body>
+</html>

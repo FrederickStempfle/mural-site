@@ -522,6 +522,31 @@
     pointer-events: none;
   }
 
+  /* ---------- roadmap teaser ---------- */
+
+  .roadmap-strip { padding: 0; }
+
+  .teaser-note {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    flex-wrap: wrap;
+    background: var(--panel);
+    border: 2px solid var(--line);
+    border-radius: var(--r-c);
+    padding: 36px 42px 32px;
+    transform: rotate(-0.4deg);
+    transition: border-color 0.35s;
+  }
+  .teaser-note:hover { border-color: var(--peri); }
+  .teaser-note .tape { top: -14px; left: 9%; transform: rotate(-4deg); }
+  .teaser-note h2 { font-size: clamp(1.5rem, 2.6vw, 1.9rem); margin-bottom: 8px; }
+  .teaser-note .section-sub { font-size: 1.05rem; max-width: 36rem; }
+  .teaser-copy { flex: 1 1 380px; }
+  .teaser-note .btn { flex: none; }
+
   /* ---------- download ---------- */
 
   .download-note {
@@ -610,6 +635,37 @@
   .faq-body { padding: 0 24px 20px; color: var(--muted); font-size: 1.04rem; }
   .faq-body b { color: var(--ink); font-weight: normal; }
   .faq-body + .faq-body { padding-top: 0; margin-top: -6px; }
+
+  /* ---------- support ---------- */
+
+  .support-strip { padding: 0 0 96px; }
+
+  .support-note {
+    position: relative;
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+    background: var(--panel);
+    border: 2px solid var(--line);
+    border-radius: var(--r-b);
+    padding: 46px 40px 40px;
+    transform: rotate(0.4deg);
+    transition: border-color 0.35s;
+  }
+  .support-note:hover { border-color: var(--pink); }
+  .support-note .tape { top: -14px; right: 13%; transform: rotate(4deg); }
+  .support-sticker {
+    position: absolute;
+    width: 84px;
+    top: -34px;
+    left: -26px;
+    transform: rotate(-12deg);
+    pointer-events: none;
+  }
+  .support-note h2 { margin-bottom: 10px; }
+  .support-note p { color: var(--muted); font-size: 1.06rem; max-width: 30rem; margin: 0 auto 26px; }
+  .support-note p b { color: var(--khaki); font-weight: normal; }
+  .support-note .btn svg { stroke: var(--pink); fill: none; }
 
   /* ---------- footer ---------- */
 
@@ -767,6 +823,7 @@
       <a href="#gallery">Gallery</a>
       <a href="#studio">Studio</a>
       <a href="#features">Features</a>
+      <a href="/roadmap.html">Roadmap</a>
       <a class="btn btn-pink" href="https://github.com/FrederickStempfle/Mural/releases/download/v1.0.0/Mural.dmg" download="Mural.dmg">Get Mural</a>
     </div>
   </nav>
@@ -980,6 +1037,24 @@
     </div>
   </section>
 
+  <!-- ============ ROADMAP TEASER ============ -->
+  <section class="roadmap-strip" aria-label="Roadmap">
+    <div class="wrap">
+      <div class="teaser-note reveal">
+        <span class="tape tape-pink"></span>
+        <div class="teaser-copy">
+          <p class="kicker">Where next?</p>
+          <h2>Soon, this wall belongs to everyone.</h2>
+          <p class="section-sub">
+            A community server is in the works — fresh wallpapers straight into the app,
+            and one day you'll publish your own from the Studio.
+          </p>
+        </div>
+        <a class="btn btn-ghost" href="/roadmap.html">See the roadmap →</a>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ DOWNLOAD ============ -->
   <section id="download">
     <div class="wrap">
@@ -1060,6 +1135,28 @@
     </div>
   </section>
 
+  <!-- ============ SUPPORT ============ -->
+  <section class="support-strip" aria-label="Support Mural">
+    <div class="wrap">
+      <div class="support-note reveal">
+        <span class="tape tape-sand"></span>
+        <img class="support-sticker" src="assets/stickers/Sticker-Heart-Doodle.webp" alt="" aria-hidden="true" width="240" height="240" />
+        <h2>Keep the wall up.</h2>
+        <p>
+          Mural is free forever — that part never changes. If it makes your desktop
+          happier, you can chip in: donations go toward the <b>Apple developer fee</b>
+          (so downloads stop scaring people) and the <b>community server</b> on the roadmap.
+        </p>
+        <a class="btn btn-ghost" href="https://github.com/sponsors/FrederickStempfle" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 20.5s-8-4.7-8-10A4.6 4.6 0 0 1 12 7.2 4.6 4.6 0 0 1 20 10.5c0 5.3-8 10-8 10z" />
+          </svg>
+          Sponsor on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <footer>
@@ -1081,11 +1178,13 @@
           <a href="#features">Features</a>
           <a href="#download">Download</a>
           <a href="#faq">FAQ</a>
+          <a href="/roadmap.html">Roadmap</a>
         </div>
         <div class="foot-col">
           <h4>Elsewhere</h4>
           <a href="https://github.com/FrederickStempfle/Mural" target="_blank" rel="noopener">GitHub</a>
           <a href="https://github.com/FrederickStempfle/Mural/releases" target="_blank" rel="noopener">Releases</a>
+          <a href="https://github.com/sponsors/FrederickStempfle" target="_blank" rel="noopener">Sponsor</a>
           <a href="/third-party-notices.html">Third-party notices</a>
           <a href="/privacy.html">Privacy</a>
         </div>
