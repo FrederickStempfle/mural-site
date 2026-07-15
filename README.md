@@ -13,7 +13,7 @@
   <br />
   A hand-drawn landing page for <a href="https://github.com/FrederickStempfle/Mural">Mural</a>.
   <br />
-  Four static pages. No framework, no tracking, no build-time magic.
+  Four hand-written pages. Vite bundles them — nothing renders them.
 </p>
 
 <p align="center">
@@ -53,7 +53,9 @@
 
 ## What this is
 
-Mural is a free, native macOS wallpaper app. This repo is only its landing page — four hand-written HTML pages that explain the app and hand over a `.dmg`. Vite bundles and fingerprints the assets; there is no framework and no analytics.
+Mural is a free, native macOS wallpaper app. This repo is only its landing page — four hand-written HTML pages that explain the app and hand over a `.dmg`.
+
+Vite's whole job here is bundling and asset fingerprinting; it never touches the markup. The pages are plain HTML with their own `<style>` blocks, and `src/main.js` is a few lines of vanilla DOM code. No analytics.
 
 > The app itself lives at **[FrederickStempfle/Mural](https://github.com/FrederickStempfle/Mural)**.
 
