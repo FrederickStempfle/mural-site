@@ -13,7 +13,6 @@
   <br />
   A hand-drawn landing page for <a href="https://github.com/FrederickStempfle/Mural">Mural</a>.
   <br />
-  Four hand-written pages. Vite bundles them — nothing renders them.
 </p>
 
 <p align="center">
