@@ -24,16 +24,6 @@
 </p>
 
 <p align="center">
-  <a href="#what-this-is">What this is</a>
-  &nbsp;·&nbsp;
-  <a href="#run-it">Run it</a>
-  &nbsp;·&nbsp;
-  <a href="#ship-it">Ship it</a>
-  &nbsp;·&nbsp;
-  <a href="#where-things-live">Where things live</a>
-</p>
-
-<p align="center">
   <a href="https://mural-site-cy1.pages.dev/"><strong>→&nbsp; See it live</strong></a>
 </p>
 
@@ -51,52 +41,13 @@
 
 ---
 
-## What this is
-
-Mural is a free, native macOS wallpaper app. This repo is only its landing page — four hand-written HTML pages that explain the app and hand over a `.dmg`.
-
-Vite's whole job here is bundling and asset fingerprinting; it never touches the markup. The pages are plain HTML with their own `<style>` blocks, and `src/main.js` is a few lines of vanilla DOM code. No analytics.
-
-> The app itself lives at **[FrederickStempfle/Mural](https://github.com/FrederickStempfle/Mural)**.
-
-## Run it
-
 ```sh
 npm install
-npm run dev
+npm run dev      # dev server
+npm run build    # → dist/, served by Cloudflare Pages
 ```
 
-Vite is the only dependency. To check the real production output before shipping:
-
-```sh
-npm run build
-npm run preview
-```
-
-## Ship it
-
-`npm run build` writes the site to `dist/`, which Cloudflare Pages serves.
-
-| | |
-|---|---|
-| **Build command** | `npm run build` |
-| **Output directory** | `dist` |
-| **Live at** | [mural-site-cy1.pages.dev](https://mural-site-cy1.pages.dev/) |
-
-**Adding a page?** List it as a Rollup input in `vite.config.js`. Miss that and the page works in dev, then silently vanishes from the build.
-
-## Where things live
-
-Each page is self-contained — markup and its own `<style>` block in one file. Edit the words directly in the HTML.
-
-| | |
-|---|---|
-| `index.html` | the landing page |
-| `roadmap.html` &nbsp;·&nbsp; `privacy.html` &nbsp;·&nbsp; `third-party-notices.html` | the rest |
-| `src/main.js` | reveal-on-scroll, and nothing else |
-| `public/assets/` | images, stickers, and Virgil |
-
-Images are `.jpg` + `.webp` pairs: the `.webp` is what loads, the `.jpg` is the fallback and social preview. Keep `width`, `height`, and real `alt` text on every one.
+The app itself lives at **[FrederickStempfle/Mural](https://github.com/FrederickStempfle/Mural)**.
 
 <br />
 
@@ -104,7 +55,4 @@ Images are `.jpg` + `.webp` pairs: the `.webp` is what loads, the `.jpg` is the 
   <img src="public/assets/img/LogoMark.png" alt="Mural logo mark" width="72" />
   <br />
   <sub><em>Made for Macs that deserve better backgrounds.</em></sub>
-  <br />
-  <br />
-  <sub>Free &amp; open source, forever.</sub>
 </p>
