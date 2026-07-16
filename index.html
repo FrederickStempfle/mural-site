@@ -410,6 +410,96 @@
     text-align: right;
   }
 
+  /* ---------- lightbox ---------- */
+
+  /* the image itself is the button — no box of its own */
+  .shot-trigger {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    cursor: zoom-in;
+  }
+  .shot-trigger:focus-visible { outline: 3px dashed var(--peri); outline-offset: 3px; }
+
+  html:has(.lightbox[open]) { overflow: hidden; }
+
+  .lightbox {
+    /* the `* { margin: 0 }` reset kills the UA's margin:auto, which is what centres a modal dialog */
+    inset: 0;
+    margin: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    width: fit-content;
+    max-width: min(1180px, 92vw);
+    max-height: 92vh;
+    overflow: visible;
+  }
+  .lightbox::backdrop {
+    background: rgba(12, 9, 14, 0.84);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+  }
+
+  .lightbox-frame {
+    position: relative;
+    background: var(--panel);
+    border: 2.5px solid var(--line);
+    border-radius: var(--r-a);
+    padding: 11px;
+    box-shadow: 0 34px 80px -22px rgba(0, 0, 0, 0.75);
+  }
+  .lightbox-frame .tape { top: -13px; left: 46%; transform: rotate(-3deg); }
+  .lightbox img {
+    border-radius: 12px 5px 12px 5px;
+    /* leave room for the frame padding and the caption underneath */
+    max-height: calc(92vh - 120px);
+    max-width: 100%;
+    width: auto;
+    margin: 0 auto;
+  }
+  .lightbox figcaption {
+    padding: 12px 6px 4px;
+    font-size: 1.08rem;
+    color: var(--ink-strong);
+    text-align: center;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: -19px;
+    right: -19px;
+    z-index: 5;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    font-family: inherit;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--pink-ink);
+    background: var(--pink);
+    border: 2px solid var(--pink-deep);
+    border-radius: var(--r-b);
+    transition: transform 0.25s var(--ease-out), background 0.25s var(--ease-out);
+  }
+  .lightbox-close:hover { background: #f6b3cb; transform: rotate(-6deg) scale(1.05); }
+  .lightbox-close:focus-visible { outline: 3px dashed var(--peri); outline-offset: 3px; }
+
+  .lightbox[open] { animation: lb-pop 0.3s var(--ease-out); }
+  .lightbox[open]::backdrop { animation: lb-fade 0.3s var(--ease-out); }
+  @keyframes lb-pop {
+    from { opacity: 0; transform: scale(0.96) rotate(-0.4deg); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes lb-fade { from { opacity: 0; } to { opacity: 1; } }
+
   /* ---------- studio (zig-zag) ---------- */
 
   .studio { background: var(--bg-raise); border-top: 2px solid var(--line-soft); border-bottom: 2px solid var(--line-soft); }
@@ -779,6 +869,8 @@
     .reveal { opacity: 1; transform: none; transition: none; }
     .hero-shot, .hero-polaroid, .marquee-track { animation: none; }
     .squiggle path { stroke-dashoffset: 0; animation: none; }
+    .lightbox[open], .lightbox[open]::backdrop { animation: none; }
+    .lightbox-close { transition: none; }
   }
 
   /* ---------- responsive ---------- */
@@ -803,6 +895,15 @@
     .hero-doodle { width: 80px; top: -34px; right: -4px; }
     .zig-sticker { width: 76px !important; right: -4px !important; left: auto !important; }
     section { padding: 72px 0; }
+
+    /* the frame nearly fills a phone, so keep the close button from hanging off-screen */
+    .lightbox-close {
+      top: -12px;
+      right: -6px;
+      width: 36px;
+      height: 36px;
+      font-size: 1.3rem;
+    }
   }
 </style>
 <noscript>
@@ -911,15 +1012,15 @@
       </div>
 
       <div class="gallery-grid">
-        <figure class="wall-card reveal"><span class="tape tape-blue"></span><img src="assets/img/amalfi-reverie.webp" alt="Amalfi Reverie — a sepia coastal terrace overlooking the sea" loading="lazy" width="900" height="584" /><figcaption><b>Amalfi Reverie</b><small>Mural Studio</small></figcaption></figure>
-        <figure class="wall-card reveal" style="--d: 0.06s;"><span class="tape tape-pink"></span><img src="assets/img/shinjuku-rain.webp" alt="Shinjuku Rain — neon signs reflecting on a wet Tokyo street" loading="lazy" width="900" height="584" /><figcaption><b>Shinjuku Rain</b><small>Neon nights</small></figcaption></figure>
-        <figure class="wall-card reveal" style="--d: 0.12s;"><span class="tape tape-sand"></span><img src="assets/img/northern-lights-observatory.webp" alt="Northern Lights Observatory — aurora over a snowy observatory" loading="lazy" width="900" height="584" /><figcaption><b>Northern Lights Observatory</b><small>Quiet skies</small></figcaption></figure>
-        <figure class="wall-card reveal"><span class="tape tape-pink"></span><img src="assets/img/lake-ashi-woodblock.webp" alt="Lake Ashi Woodblock — a woodblock-print style lake and torii gate" loading="lazy" width="900" height="584" /><figcaption><b>Lake Ashi Woodblock</b><small>Woodblock prints</small></figcaption></figure>
-        <figure class="wall-card reveal" style="--d: 0.06s;"><span class="tape tape-blue"></span><img src="assets/img/zen-garden-dawn.webp" alt="Zen Garden Dawn — raked sand and stones at first light" loading="lazy" width="900" height="584" /><figcaption><b>Zen Garden Dawn</b><small>Quiet mornings</small></figcaption></figure>
-        <figure class="wall-card reveal" style="--d: 0.12s;"><span class="tape tape-sand"></span><img src="assets/img/pacific-coast-highway.webp" alt="Pacific Coast Highway — cliffs and ocean along a winding road" loading="lazy" width="900" height="584" /><figcaption><b>Pacific Coast Highway</b><small>Open roads</small></figcaption></figure>
-        <figure class="wall-card reveal"><span class="tape tape-blue"></span><img src="assets/img/ginza-crossing.webp" alt="Ginza Crossing — a busy Tokyo intersection in stylised colour" loading="lazy" width="900" height="584" /><figcaption><b>Ginza Crossing</b><small>Anime skylines</small></figcaption></figure>
-        <figure class="wall-card reveal" style="--d: 0.06s;"><span class="tape tape-pink"></span><img src="assets/img/highland-fog.webp" alt="Highland Fog — misty layered hills in muted blues" loading="lazy" width="900" height="584" /><figcaption><b>Highland Fog</b><small>Quiet skies</small></figcaption></figure>
-        <figure class="wall-card reveal" style="--d: 0.12s;"><span class="tape tape-sand"></span><img src="assets/img/yasaka-pagoda-path.webp" alt="Yasaka Pagoda Path — a lantern-lit street leading to a pagoda" loading="lazy" width="900" height="584" /><figcaption><b>Yasaka Pagoda Path</b><small>Evening walks</small></figcaption></figure>
+        <figure class="wall-card reveal"><span class="tape tape-blue"></span><button class="shot-trigger" type="button" aria-label="Expand Amalfi Reverie"><img src="assets/img/amalfi-reverie.webp" alt="Amalfi Reverie — a sepia coastal terrace overlooking the sea" loading="lazy" width="900" height="584" /></button><figcaption><b>Amalfi Reverie</b><small>Mural Studio</small></figcaption></figure>
+        <figure class="wall-card reveal" style="--d: 0.06s;"><span class="tape tape-pink"></span><button class="shot-trigger" type="button" aria-label="Expand Shinjuku Rain"><img src="assets/img/shinjuku-rain.webp" alt="Shinjuku Rain — neon signs reflecting on a wet Tokyo street" loading="lazy" width="900" height="584" /></button><figcaption><b>Shinjuku Rain</b><small>Neon nights</small></figcaption></figure>
+        <figure class="wall-card reveal" style="--d: 0.12s;"><span class="tape tape-sand"></span><button class="shot-trigger" type="button" aria-label="Expand Northern Lights Observatory"><img src="assets/img/northern-lights-observatory.webp" alt="Northern Lights Observatory — aurora over a snowy observatory" loading="lazy" width="900" height="584" /></button><figcaption><b>Northern Lights Observatory</b><small>Quiet skies</small></figcaption></figure>
+        <figure class="wall-card reveal"><span class="tape tape-pink"></span><button class="shot-trigger" type="button" aria-label="Expand Lake Ashi Woodblock"><img src="assets/img/lake-ashi-woodblock.webp" alt="Lake Ashi Woodblock — a woodblock-print style lake and torii gate" loading="lazy" width="900" height="584" /></button><figcaption><b>Lake Ashi Woodblock</b><small>Woodblock prints</small></figcaption></figure>
+        <figure class="wall-card reveal" style="--d: 0.06s;"><span class="tape tape-blue"></span><button class="shot-trigger" type="button" aria-label="Expand Zen Garden Dawn"><img src="assets/img/zen-garden-dawn.webp" alt="Zen Garden Dawn — raked sand and stones at first light" loading="lazy" width="900" height="584" /></button><figcaption><b>Zen Garden Dawn</b><small>Quiet mornings</small></figcaption></figure>
+        <figure class="wall-card reveal" style="--d: 0.12s;"><span class="tape tape-sand"></span><button class="shot-trigger" type="button" aria-label="Expand Pacific Coast Highway"><img src="assets/img/pacific-coast-highway.webp" alt="Pacific Coast Highway — cliffs and ocean along a winding road" loading="lazy" width="900" height="584" /></button><figcaption><b>Pacific Coast Highway</b><small>Open roads</small></figcaption></figure>
+        <figure class="wall-card reveal"><span class="tape tape-blue"></span><button class="shot-trigger" type="button" aria-label="Expand Ginza Crossing"><img src="assets/img/ginza-crossing.webp" alt="Ginza Crossing — a busy Tokyo intersection in stylised colour" loading="lazy" width="900" height="584" /></button><figcaption><b>Ginza Crossing</b><small>Anime skylines</small></figcaption></figure>
+        <figure class="wall-card reveal" style="--d: 0.06s;"><span class="tape tape-pink"></span><button class="shot-trigger" type="button" aria-label="Expand Highland Fog"><img src="assets/img/highland-fog.webp" alt="Highland Fog — misty layered hills in muted blues" loading="lazy" width="900" height="584" /></button><figcaption><b>Highland Fog</b><small>Quiet skies</small></figcaption></figure>
+        <figure class="wall-card reveal" style="--d: 0.12s;"><span class="tape tape-sand"></span><button class="shot-trigger" type="button" aria-label="Expand Yasaka Pagoda Path"><img src="assets/img/yasaka-pagoda-path.webp" alt="Yasaka Pagoda Path — a lantern-lit street leading to a pagoda" loading="lazy" width="900" height="584" /></button><figcaption><b>Yasaka Pagoda Path</b><small>Evening walks</small></figcaption></figure>
       </div>
       <p class="gallery-footnote reveal">…and nine more waiting in the box.</p>
     </div>
@@ -946,7 +1047,7 @@
           <img class="zig-sticker" src="assets/stickers/Sticker-Sun-Doodle.webp" alt="" aria-hidden="true" width="240" height="240" style="top: -54px; right: -26px; transform: rotate(12deg);" />
           <div class="zig-frame">
             <span class="tape tape-pink"></span>
-            <img src="assets/img/studio-styles.webp" alt="The twelve Mural Studio backdrop styles, each rendered in a different palette" loading="lazy" width="1400" height="657" />
+            <button class="shot-trigger" type="button" aria-label="Expand The twelve Mural Studio backdrop styles, each rendered in a different palette"><img src="assets/img/studio-styles.webp" alt="The twelve Mural Studio backdrop styles, each rendered in a different palette" loading="lazy" width="1400" height="657" /></button>
           </div>
         </div>
       </div>
@@ -969,7 +1070,7 @@
           <img class="zig-sticker" src="assets/stickers/Sticker-Heart-Doodle.webp" alt="" aria-hidden="true" width="240" height="240" style="bottom: -44px; left: -30px; width: 96px; transform: rotate(-10deg);" />
           <div class="zig-frame">
             <span class="tape tape-blue"></span>
-            <img src="assets/img/studio-collage.webp" alt="A Mural Studio collage with a photo backdrop, washi tape, paper notes, and doodle stickers" loading="lazy" width="1400" height="875" />
+            <button class="shot-trigger" type="button" aria-label="Expand A Mural Studio collage with a photo backdrop, washi tape, paper notes, and doodle stickers"><img src="assets/img/studio-collage.webp" alt="A Mural Studio collage with a photo backdrop, washi tape, paper notes, and doodle stickers" loading="lazy" width="1400" height="875" /></button>
           </div>
         </div>
       </div>
@@ -1201,6 +1302,15 @@
     <span style="--d: 0s;">M</span><span style="--d: 0.07s;">U</span><span style="--d: 0.14s;">R</span><span style="--d: 0.21s;">A</span><span style="--d: 0.28s;">L</span>
   </div>
 </footer>
+
+<dialog class="lightbox" aria-label="Wallpaper preview">
+  <figure class="lightbox-frame">
+    <span class="tape tape-pink"></span>
+    <button class="lightbox-close" type="button" aria-label="Close preview">&times;</button>
+    <img alt="" />
+    <figcaption></figcaption>
+  </figure>
+</dialog>
 
 <script type="module" src="/src/main.js"></script>
 
